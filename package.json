@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/chisu-kawahara/tinyapp/issues"
   },
-  "homepage": "https://github.com/chisu-kawahara/tinyapp#readme"
+  "homepage": "https://github.com/chisu-kawahara/tinyapp#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }
