@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -70,10 +74,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  // get the username from the request body
   const username = req.body.username;
-  // set a cookie with the username
-  res.cookie('username', username);
-  // redirect to /urls
-  res.redirect('/urls');
+  res.cookie('username', username);  // sets cookie named 'username'
+  res.redirect('/urls');              // redirect after login
 });
