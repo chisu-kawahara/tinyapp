@@ -78,3 +78,12 @@ app.post('/login', (req, res) => {
   res.cookie('username', username);  // sets cookie named 'username'
   res.redirect('/urls');              // redirect after login
 });
+
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+    
+  };
+  res.render("urls_index", templateVars);
+});
