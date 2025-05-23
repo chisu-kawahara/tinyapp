@@ -44,6 +44,17 @@ app.post("/urls", (req, res) => {
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
+app.post("/urls", (req, res) => {
+  const longURL = req.body.longURL;
+  const shortURL = generateRandomString(); // Generate unique ID
+
+  // Save to "database"
+  urlDatabase[shortURL] = longURL;
+
+  // Redirect to /urls/:id
+  res.redirect(`/urls/${shortURL}`);
+});
+
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
