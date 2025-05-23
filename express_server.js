@@ -83,7 +83,12 @@ app.get("/urls", (req, res) => {
   const templateVars = {
     username: req.cookies["username"],
     // ... any other vars
-    
+
   };
   res.render("urls_index", templateVars);
+});
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('username');   // This clears the cookie
+  res.redirect('/urls');         // Redirects to the /urls page
 });
