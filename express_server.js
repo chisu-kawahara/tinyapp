@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
-app.set("view engine", "ejs");
+app.set('view engine', 'ejs');
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
@@ -67,4 +67,8 @@ app.post("/urls/:id", (req, res) => {
   const newLongURL = req.body.longURL;
   urlDatabase[id] = newLongURL;
   res.redirect("/urls");
+});
+
+app.get('/register', (req, res) => {
+  res.render('register');
 });
