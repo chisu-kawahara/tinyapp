@@ -136,7 +136,13 @@ app.get("/urls", (req, res) => {
 	const templateVars = { urls: urlDatabase };
 	res.render("urls_index", templateVars);
 });
-
+//Route to urls_show.ejs
+app.get("/urls/:id", (req, res) => {
+	const id = req.params.id;
+	const longURL = urlDatabase[id];
+	const templateVars = { id, longURL };
+	res.render("urls_show", templateVars);
+});
 
 
 		app.use(express.urlencoded({ extended: true }));
@@ -152,12 +158,7 @@ app.get("/urls", (req, res) => {
 			res.redirect(`/urls/${shortURL}`);
 		});
 
-		app.get("/urls/:id", (req, res) => {
-			const id = req.params.id;
-			const longURL = urlDatabase[id];
-			const templateVars = { id, longURL };
-			res.render("urls_show", templateVars);
-		});
+
 		app.post("/urls/:id/delete", (req, res) => {
 			const id = req.params.id;
 			delete urlDatabase[id];
