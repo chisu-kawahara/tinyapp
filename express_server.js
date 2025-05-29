@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+app.use(express.urlencoded({ extended: true }));
+
+
 //configurations
 app.set("view engine", "ejs");
 
@@ -93,6 +96,7 @@ if (!userId)
 		});
 
 		//---------------------------------------
+		/*
 		const urlDatabase = {
 			b2xVn2: "http://www.lighthouselabs.ca",
 			"9sm5xK": "http://www.google.com",
@@ -124,10 +128,10 @@ if (!userId)
 				password: "dishwasher-funk",
 			},
 		};
+*/
 
-		//-------
-
-		app.get("/urls/new", (req, res) => {
+//Route to urls_new.ejs
+app.get("/urls/new", (req, res) => {
 			res.render("urls_new");
 		});
 
@@ -136,6 +140,7 @@ app.get("/urls", (req, res) => {
 	const templateVars = { urls: urlDatabase };
 	res.render("urls_index", templateVars);
 });
+
 //Route to urls_show.ejs
 app.get("/urls/:id", (req, res) => {
 	const id = req.params.id;
@@ -144,33 +149,48 @@ app.get("/urls/:id", (req, res) => {
 	res.render("urls_show", templateVars);
 });
 
+// take the user to the real site
+app.get("/u/:id", (req, res) => {
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL];
 
-		app.use(express.urlencoded({ extended: true }));
-
-		app.post("/urls", (req, res) => {
-			const longURL = req.body.longURL;
-			const shortURL = generateRandomString(); // Generate unique ID
-
-			// Save to "database"
-			urlDatabase[shortURL] = longURL;
-
-			// Redirect to /urls/:id
-			res.redirect(`/urls/${shortURL}`);
-		});
+  if (longURL) {
+    res.redirect(longURL); // take the user to the real site
+  } else {
+    res.status(404).send("Short URL not found.");
+  }
+});
 
 
-		app.post("/urls/:id/delete", (req, res) => {
-			const id = req.params.id;
-			delete urlDatabase[id];
-			res.redirect("/urls");
-		});
+//-------------------- Post Routes --------------------
+// Route to handle POST requests to /urls
 
-		app.post("/urls/:id", (req, res) => {
-			const id = req.params.id;
-			const newLongURL = req.body.longURL;
-			urlDatabase[id] = newLongURL;
-			res.redirect("/urls");
-		});
+
+function generateRandomString() {
+  return Math.random().toString(36).substring(2, 8);
+}
+app.post("/urls", (req, res) => {
+  const shortURL = generateRandomString(); // generate the ID
+  const longURL = req.body.longURL; // get the long URL from the form
+
+  urlDatabase[shortURL] = longURL; // save it in the database!
+
+  res.redirect(`/urls/${shortURL}`); // redirect the user to a new page
+});
+
+
+app.post("/urls/:id/delete", (req, res) => {
+	const id = req.params.id;
+	delete urlDatabase[id];
+	res.redirect("/urls");
+});
+
+app.post("/urls/:id", (req, res) => {
+	const id = req.params.id;
+	const newLongURL = req.body.longURL;
+	urlDatabase[id] = newLongURL;
+	res.redirect("/urls");
+});
 
 		app.get("/register", (req, res) => {
 			res.render("register");
@@ -185,9 +205,10 @@ app.get("/urls/:id", (req, res) => {
 			res.clearCookie("user_id");
 			res.redirect("/login");
 		});
+//--------------------
 
-		//--------------------
-		app.listen(PORT, () => {
-			console.log(`Example app listening on port ${PORT}!`);
-		});
+
+app.listen(PORT, () => {
+	console.log(`Example app listening on port ${PORT}!`);
 	});
+});
