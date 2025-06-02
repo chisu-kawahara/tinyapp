@@ -1,4 +1,6 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
+
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -207,10 +209,10 @@ app.post("/urls/:id", (req, res) => {
 		});
 
 		app.post("/logout", (req, res) => {
-			res.clearCookie("user_id");
-			res.redirect("/login");
+			res.clearCookie("username");
+			res.redirect("/urls");
 		});
-
+		
 
 
 

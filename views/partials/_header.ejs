@@ -19,9 +19,18 @@
       </div>
     </div>
   </nav>
-  <form method="POST" action="/login" style="margin: 10px;">
-    <input type="text" name="username" placeholder="Username" required>
-    <button type="submit">Login</button>
-  </form>
-  
+
+  <% if (username) { %>
+    <div class="p-2">
+      <p>Logged in as: <strong><%= username %></strong></p>
+      <form method="POST" action="/logout">
+        <button type="submit" class="btn btn-light">Logout</button>
+      </form>
+    </div>
+  <% } else { %>
+    <form method="POST" action="/login" class="form-inline p-2">
+      <input type="text" name="username" placeholder="Username" class="form-control mr-2" required />
+      <button type="submit" class="btn btn-light">Login</button>
+    </form>
+  <% } %>
 </header>
