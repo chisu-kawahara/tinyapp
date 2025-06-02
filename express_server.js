@@ -56,9 +56,10 @@ app.get("/hello", (req, res) => {
 // GET: Registration Page
 app.get("/register", (req, res) => {
   const userId = req.cookies["user_id"];
-  const user = users[userId];
-  const templateVars = { user };
-  res.render("register", templateVars);
+  if (userId && users[userId]) {
+    return res.redirect("/urls"); // if logged in → send to /urls
+  }
+  res.render("register"); // if not logged in → show the form
 });
 
 // POST: Register a new user
@@ -86,8 +87,14 @@ app.post("/register", (req, res) => {
 
 // POST: Login
 app.post("/login", (req, res) => {
-	const email = req.body.email;
-	const password = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).send("Email and password cannot be empty.");
+  }
+
+  const user = getUserByEmail(email, users);
 
   if (!user) {
     return res.status(403).send("User not found");
@@ -97,25 +104,9 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Incorrect password");
   }
 
-  if (!email || !password) {
-    return res.status(400).send("Email and password cannot be empty.");
-  }
-
-  let foundUser = null;
-  for (let userId in users) {
-    const user = users[userId];
-    if (user.email === email && user.password === password) {
-      foundUser = user;
-      break;
-    }
-  }
-
-  if (!foundUser) {
-    return res.status(403).send("Invalid email or password.");
-  }
-
-  res.cookie("user_id", foundUser.id);
+  res.cookie("user_id", user.id);
   res.redirect("/urls");
+
 });
 
 // POST: Logout
@@ -128,14 +119,12 @@ app.post("/logout", (req, res) => {
 //GET: login
 app.get("/login", (req, res) => {
   const userId = req.cookies["user_id"];
-  const user = users[userId];
+  if (userId && users[userId]) {
+    return res.redirect("/urls"); // if logged in, go to /urls
+  }
+  res.render("login"); // if not, show the login page
+})
 
-  const templateVars = {
-    user // pass the full user object (or undefined)
-  };
-
-  res.render("login", templateVars);
-});
 
 // GET: urls index
 app.get("/urls", (req, res) => {
@@ -148,6 +137,9 @@ app.get("/urls", (req, res) => {
 // GET: Create new url
 app.get("/urls/new", (req, res) => {
   const userId = req.cookies["user_id"];
+  if (!userId || !users[userId]) {
+    return res.redirect("/login");
+  }
   const user = users[userId];
   const templateVars = { user };
   res.render("urls_new", templateVars);
@@ -166,10 +158,10 @@ app.get("/urls/:id", (req, res) => {
 // GET: Redirect to long URL
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL];
+  const urlData = urlDatabase[shortURL];
 
-  if (longURL) {
-    res.redirect(longURL);
+  if (urlData) {
+    res.redirect(urlData.longURL);
   } else {
     res.status(404).send("Short URL not found.");
   }
@@ -177,9 +169,17 @@ app.get("/u/:id", (req, res) => {
 
 // POST: Create a new short URL
 app.post("/urls", (req, res) => {
-  const shortURL = generateRandomString();
+  const userId = req.cookies["user_id"];
+  if (!userId || !users[userId]) {
+    return res.status(403).send("You must be logged in to shorten URLs.");
+  }
+
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = {
+    longURL,
+    userID: userId
+  };
   res.redirect(`/urls/${shortURL}`);
 });
 
