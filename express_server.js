@@ -35,6 +35,9 @@ const urlDatabase = {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
   },
+  b2xVn2: { 
+    longURL: "http://www.lighthouselabs.ca", 
+    userID: "userRandomID", }
 };
 
 // GET: Home
@@ -121,22 +124,20 @@ app.get("/login", (req, res) => {
 // GET: urls index
 app.get("/urls", (req, res) => {
   const userId = req.session.user_id
-
+  const user = users[userId];
   // Check if user is logged in
-  if (!userId || !users[userId]) {
+  if (!userId) {
     return res.status(401).send("Please log in to view your URLs.");
-    // Or you could do: return res.redirect("/login");
   }
 
   // Get URLs only for this user
-  const userURLs = urlsForUser(userId);
-
-  // Get user object for template
-  const user = users[userId];
-
+  const userURLs = urlsForUser(userId, urlDatabase);
   // Send filtered URLs to the template
-  const templateVars = { user, urls: userURLs };
-  res.render("urls_index", templateVars);
+  const templateVars = {
+    urls: userURLs,
+    user: users[userId]
+  };
+  res.render("urls_new", { urls: userURLs, user: users[userId] });
 });
 
 // GET: Create new url
@@ -152,24 +153,26 @@ app.get("/urls/new", (req, res) => {
 
 // GET: Show individual url
 app.get("/urls/:id", (req, res) => {
-  const userId = req.session.user_id
-  const user = users[userId];
-  const id = req.params.id;
-  const url = urlDatabase[id];
+  const shortURL = req.params.id;
+  const userId = req.session.user_id;
+  const urlData = urlDatabase[shortURL];
 
-  if (!userId || !user) {
-    return res.status(401).send("You must be logged in to view this URL.");
-  }
-  if (!url) {
-    return res.status(404).send("URL not found.");
-  }
-  if (url.userID !== userId) {
-    return res.status(403).send("You do not have permission to view this URL.");
+  if (!urlData) {
+    return res.status(404).send("Short URL not found.");
   }
 
-  const templateVars = { id, longURL: url.longURL, user };
+  if (urlData.userID !== userId) {
+    return res.status(403).send("You do not have access to this URL.");
+  }
+
+  const templateVars = {
+    shortURL,
+    longURL: urlData.longURL,
+    user: users[userId]
+  };
   res.render("urls_show", templateVars);
 });
+
 
 // GET: Redirect to long URL
 app.get("/u/:id", (req, res) => {
@@ -219,21 +222,22 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // POST: Update a long URL
 app.post("/urls/:id", (req, res) => {
-  const userId = req.session.user_id
-  const id = req.params.id;
-  const url = urlDatabase[id];
+  const shortURL = req.params.id;
+  const newLongURL = req.body.longURL;
+  const userId = req.session.user_id;
 
-  if (!url) {
-    return res.status(404).send("URL not found.");
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("Short URL not found.");
   }
-  if (!userId || url.userID !== userId) {
+
+  if (urlDatabase[shortURL].userID !== userId) {
     return res.status(403).send("You do not have permission to edit this URL.");
   }
 
-  const newLongURL = req.body.longURL;
-  url.longURL = newLongURL;
+  urlDatabase[shortURL].longURL = newLongURL;
   res.redirect("/urls");
 });
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
