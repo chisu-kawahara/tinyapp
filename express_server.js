@@ -13,12 +13,12 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@test.com",
-    password: "12345",
+    password: bcrypt.hashSync("12345", 10), // hashed
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@test.com",
-    password: "54321",
+    password: bcrypt.hashSync("54321", 10), // hashed
   },
 };
 
@@ -115,7 +115,7 @@ app.post("/login", (req, res) => {
   if (!user) {
     return res.status(403).send("User not found");
   }
-  if (!bcrypt.compareSync(password, user.password)) { // 👈 secure check
+  if (!bcrypt.compareSync(password, user.password)) { // security check
     return res.status(403).send("Incorrect password");
   }
 
