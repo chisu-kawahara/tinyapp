@@ -22,8 +22,14 @@ const users = {
 };
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",   // Who created this URL
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 function generateRandomString() {
@@ -38,6 +44,16 @@ function getUserByEmail(email, users) {
     }
   }
   return null;
+}
+
+function urlsForUser(id) {
+  const filteredURLs = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      filteredURLs[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return filteredURLs;
 }
 
 // GET: Home
@@ -129,8 +145,21 @@ app.get("/login", (req, res) => {
 // GET: urls index
 app.get("/urls", (req, res) => {
   const userId = req.cookies["user_id"];
+
+  // Check if user is logged in
+  if (!userId || !users[userId]) {
+    return res.status(401).send("Please log in to view your URLs.");
+    // Or you could do: return res.redirect("/login");
+  }
+
+  // Get URLs only for this user
+  const userURLs = urlsForUser(userId);
+
+  // Get user object for template
   const user = users[userId];
-  const templateVars = { user, urls: urlDatabase };
+
+  // Send filtered URLs to the template
+  const templateVars = { user, urls: userURLs };
   res.render("urls_index", templateVars);
 });
 
@@ -150,7 +179,7 @@ app.get("/urls/:id", (req, res) => {
   const userId = req.cookies["user_id"];
   const user = users[userId];
   const id = req.params.id;
-  const longURL = urlDatabase[id];
+	const longURL = urlDatabase[id].longURL;
   const templateVars = { id, longURL, user };
   res.render("urls_show", templateVars);
 });
