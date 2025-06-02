@@ -115,6 +115,18 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+//GET: login
+app.get("/login", (req, res) => {
+  const userId = req.cookies["user_id"];
+  const user = users[userId];
+
+  const templateVars = {
+    user // pass the full user object (or undefined)
+  };
+
+  res.render("login", templateVars);
+});
+
 // GET: urls index
 app.get("/urls", (req, res) => {
   const userId = req.cookies["user_id"];
