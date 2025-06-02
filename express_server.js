@@ -16,7 +16,7 @@ app.set("view engine", "ejs");
 const users = {
   userRandomID: {
     id: "userRandomID",
-    email: "user@test.com",
+    email: "user1@test.com",
     password: bcrypt.hashSync("12345", 10), // hashed
   },
   user2RandomID: {
