@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 const PORT = 8080;
@@ -83,21 +84,20 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-//check for empty email and password
   if (!email || !password) {
     return res.status(400).send("Email and password cannot be empty.");
   }
-//check if the email already exists/
   const existingUser = getUserByEmail(email, users);
   if (existingUser) {
     return res.status(400).send("A user with that email already exists.");
   }
 
   const id = generateRandomString();
-  const newUser = { id, email, password };
+  const hashedPassword = bcrypt.hashSync(password, 10); // SECURE the password
+  const newUser = { id, email, password: hashedPassword };
+
   users[id] = newUser;
   res.cookie("user_id", id);
-  console.log(users); //for debugging
   res.redirect("/urls");
 });
 
@@ -115,14 +115,12 @@ app.post("/login", (req, res) => {
   if (!user) {
     return res.status(403).send("User not found");
   }
-
-  if (user.password !== password) {
+  if (!bcrypt.compareSync(password, user.password)) { // 👈 secure check
     return res.status(403).send("Incorrect password");
   }
 
   res.cookie("user_id", user.id);
   res.redirect("/urls");
-
 });
 
 // POST: Logout
@@ -130,7 +128,6 @@ app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/login");
 });
-
 
 //GET: login
 app.get("/login", (req, res) => {
