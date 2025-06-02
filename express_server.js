@@ -178,7 +178,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`); // redirect the user to a new page
 });
 
-
+// redirecrt back to the /urls page - delete button
 app.post("/urls/:id/delete", (req, res) => {
 	const id = req.params.id;
 	delete urlDatabase[id];
