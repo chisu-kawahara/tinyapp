@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+app.use(cookieParser()); // Required to read/write cookies
 app.use(express.urlencoded({ extended: true }));
 
 
@@ -95,8 +96,7 @@ if (!userId)
 			res.redirect("/urls");
 		});
 
-		//---------------------------------------
-		/*
+
 		const urlDatabase = {
 			b2xVn2: "http://www.lighthouselabs.ca",
 			"9sm5xK": "http://www.google.com",
@@ -114,7 +114,7 @@ if (!userId)
 			res.send("<html><body>Hello <b>World</b></body></html>\n");
 		});
 
-		//----------------------------------------------
+
 
 		const users = {
 			userRandomID: {
@@ -128,7 +128,6 @@ if (!userId)
 				password: "dishwasher-funk",
 			},
 		};
-*/
 
 //Route to urls_new.ejs
 app.get("/urls/new", (req, res) => {
@@ -162,8 +161,6 @@ app.get("/u/:id", (req, res) => {
 });
 
 
-//-------------------- Post Routes --------------------
-// Route to handle POST requests to /urls
 
 
 function generateRandomString() {
@@ -185,6 +182,8 @@ app.post("/urls/:id/delete", (req, res) => {
 	res.redirect("/urls");
 });
 
+//gets new long url from req.body.longURL 
+// updates the urlDatabase with new long url
 app.post("/urls/:id", (req, res) => {
 	const id = req.params.id;
 	const newLongURL = req.body.longURL;
@@ -201,11 +200,21 @@ app.post("/urls/:id", (req, res) => {
 			// other data like urls: urlDatabase
 		};
 
+		app.post("/login", (req, res) => {
+			const username = req.body.username;
+			res.cookie("username", username); // Set the cookie
+			res.redirect("/urls");            // Redirect to main page
+		});
+
 		app.post("/logout", (req, res) => {
 			res.clearCookie("user_id");
 			res.redirect("/login");
 		});
-//--------------------
+
+
+
+
+
 
 
 app.listen(PORT, () => {
