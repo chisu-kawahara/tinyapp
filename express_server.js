@@ -21,6 +21,12 @@ app.set("view engine", "ejs");
 //is user logged in?
 if (!userId)
 	//GET /register
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"], 
+  };
+  res.render("register", templateVars);
+});
 
 	//POST /register
 	app.post("/register", (req, res) => {
@@ -213,10 +219,6 @@ app.post("/urls/:id", (req, res) => {
 			res.redirect("/urls");
 		});
 		
-
-
-
-
 
 
 app.listen(PORT, () => {
