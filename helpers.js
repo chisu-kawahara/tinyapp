@@ -13,4 +13,21 @@ function getUserByEmail(email, users) {
   return null;
 }
 
+function generateRandomString() {
+  return Math.random().toString(36).substring(2, 8);
+}
+
+function urlsForUser(id) {
+  const filteredURLs = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      filteredURLs[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return filteredURLs;
+}
+
+
 module.exports = { getUserByEmail };
+module.exports = { generateRandomString };
+module.exports = { urlsForUser };

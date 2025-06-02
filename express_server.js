@@ -2,6 +2,8 @@ const express = require("express");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const { getUserByEmail } = require('./helpers');
+const { generateRandomString } = require('./helpers');
+const { urlsForUser } = require('./helpers');
 
 const app = express();
 const PORT = 8080;
@@ -37,31 +39,15 @@ const urlDatabase = {
   },
 };
 
-function generateRandomString() {
-  return Math.random().toString(36).substring(2, 8);
-}
-
-function urlsForUser(id) {
-  const filteredURLs = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      filteredURLs[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return filteredURLs;
-}
-
 // GET: Home
 app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+  const userID = req.session.user_id;
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
+  if (userID) {
+    return res.redirect("/urls");
+  }
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+  return res.redirect("/login");
 });
 
 // GET: Registration Page
