@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -12,18 +15,43 @@
   </head>
 
   <body>
+    <!-- Header -->
     <%- include("partials/_header") %>
 
-    <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">
-          Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
-        </p>
+    <!-- Main content -->
+    <main class="container mt-4 mb-4">
+      <div class="card text-center">
+        <div class="card-header">
+          TinyApp Short URL
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Tiny URL for :</h5>
+          <p class="card-text"><a href="<%= longURL %>"><%= longURL %></a></p>
+        
+          <form method="POST" action="/urls/<%= id %>" class="mb-3">
+            <div class="form-group">
+              <label for="longURL">Update URL:</label>
+              <input
+                type="text"
+                name="longURL"
+                id="longURL"
+                class="form-control"
+                value="<%= longURL %>"
+              />
+            </div>
+            <button type="submit" class="btn btn-success">Submit</button>
+          </form>
+        
+          <h5 class="card-title">Short URL ID:</h5>
+          <p class="card-text">
+            <a href="/u/<%= id %>"><%= id %></a>
+          </p>
+        
+          <a href="/urls" class="btn btn-primary">Back to My URLs</a>
+        </div>
       </div>
-      <div class="card-footer text-muted"></div>
-    </div>
+    </main>
+
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
