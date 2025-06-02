@@ -7,7 +7,7 @@ const PORT = 8080;
 
 app.use(cookieSession({
   name: "session",
-  keys: ["your-secret-key-goes-here"], // can be anything secret
+  keys: ["dkfltktensai"], // can be anything secret
 }));
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -123,7 +123,7 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Incorrect password");
   }
 
-  res.cookie("user_id", user.id);
+  req.session.user_id = user.id;
   res.redirect("/urls");
 });
 
@@ -141,7 +141,6 @@ app.get("/login", (req, res) => {
   }
   res.render("login"); // if not, show the login page
 })
-
 
 // GET: urls index
 app.get("/urls", (req, res) => {
