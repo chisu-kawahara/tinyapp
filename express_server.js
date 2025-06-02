@@ -86,7 +86,16 @@ app.post("/register", (req, res) => {
 
 // POST: Login
 app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+	const email = req.body.email;
+	const password = req.body.password;
+
+  if (!user) {
+    return res.status(403).send("User not found");
+  }
+
+  if (user.password !== password) {
+    return res.status(403).send("Incorrect password");
+  }
 
   if (!email || !password) {
     return res.status(400).send("Email and password cannot be empty.");
@@ -112,8 +121,9 @@ app.post("/login", (req, res) => {
 // POST: Logout
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
+
 
 //GET: login
 app.get("/login", (req, res) => {
