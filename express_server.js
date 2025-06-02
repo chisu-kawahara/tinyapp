@@ -41,16 +41,6 @@ function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
 
-function getUserByEmail(email, users) {
-  for (const userId in users) {
-    const user = users[userId];
-    if (user.email === email) {
-      return user; // return the whole user object
-    }
-  }
-  return null;
-}
-
 function urlsForUser(id) {
   const filteredURLs = {};
   for (const shortURL in urlDatabase) {
