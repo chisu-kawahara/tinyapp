@@ -1,11 +1,14 @@
 const express = require("express");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 
 const app = express();
 const PORT = 8080;
 
-app.use(cookieParser());
+app.use(cookieSession({
+  name: "session",
+  keys: ["your-secret-key-goes-here"], // can be anything secret
+}));
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -72,7 +75,7 @@ app.get("/hello", (req, res) => {
 
 // GET: Registration Page
 app.get("/register", (req, res) => {
-  const userId = req.cookies["user_id"];
+	const userId = req.session.user_id
   if (userId && users[userId]) {
     return res.redirect("/urls"); // if logged in → send to /urls
   }
@@ -98,7 +101,7 @@ app.post("/register", (req, res) => {
   const newUser = { id, email, password: hashedPassword };
 
   users[id] = newUser;
-  res.cookie("user_id", id);
+  req.session.user_id = id;
   res.redirect("/urls");
 });
 
@@ -126,13 +129,13 @@ app.post("/login", (req, res) => {
 
 // POST: Logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null
   res.redirect("/login");
 });
 
 //GET: login
 app.get("/login", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id
   if (userId && users[userId]) {
     return res.redirect("/urls"); // if logged in, go to /urls
   }
@@ -142,7 +145,7 @@ app.get("/login", (req, res) => {
 
 // GET: urls index
 app.get("/urls", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id
 
   // Check if user is logged in
   if (!userId || !users[userId]) {
@@ -163,7 +166,7 @@ app.get("/urls", (req, res) => {
 
 // GET: Create new url
 app.get("/urls/new", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id
   if (!userId || !users[userId]) {
     return res.redirect("/login");
   }
@@ -174,7 +177,7 @@ app.get("/urls/new", (req, res) => {
 
 // GET: Show individual url
 app.get("/urls/:id", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id
   const user = users[userId];
   const id = req.params.id;
   const url = urlDatabase[id];
@@ -207,7 +210,7 @@ app.get("/u/:id", (req, res) => {
 
 // POST: Create a new short URL
 app.post("/urls", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id
   if (!userId || !users[userId]) {
     return res.status(403).send("You must be logged in to shorten URLs.");
   }
@@ -223,7 +226,7 @@ app.post("/urls", (req, res) => {
 
 // POST: Delete a short URL
 app.post("/urls/:id/delete", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id
   const id = req.params.id;
   const url = urlDatabase[id];
 
@@ -241,7 +244,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // POST: Update a long URL
 app.post("/urls/:id", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.user_id
   const id = req.params.id;
   const url = urlDatabase[id];
 
