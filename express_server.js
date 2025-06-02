@@ -1,9 +1,7 @@
 const express = require("express");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
-const { getUserByEmail } = require('./helpers');
-const { generateRandomString } = require('./helpers');
-const { urlsForUser } = require('./helpers');
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 
 const app = express();
 const PORT = 8080;
@@ -56,7 +54,8 @@ app.get("/register", (req, res) => {
   if (userId && users[userId]) {
     return res.redirect("/urls"); // if logged in → send to /urls
   }
-  res.render("register"); // if not logged in → show the form
+  const user = users[userId];
+  res.render("register", {user}); // if not logged in → show the form
 });
 
 // POST: Register a new user
@@ -86,12 +85,11 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const user = getUserByEmail(email, users);
 
   if (!email || !password) {
     return res.status(400).send("Email and password cannot be empty.");
   }
-
-  const user = getUserByEmail(email, users);
 
   if (!user) {
     return res.status(403).send("User not found");
@@ -116,7 +114,8 @@ app.get("/login", (req, res) => {
   if (userId && users[userId]) {
     return res.redirect("/urls"); // if logged in, go to /urls
   }
-  res.render("login"); // if not, show the login page
+  const user = users[userId];
+  res.render("login", {user}); // if not, show the login page
 })
 
 // GET: urls index

@@ -18,21 +18,21 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+  
+    <% if (user) { %>
+      <div class="p-2">
+        <p>Logged in as: <strong><%= user.email %></strong></p>
+        <form method="POST" action="/logout">
+          <button type="submit" class="btn btn-light">Logout</button>
+        </form>
+      </div>
+    <% } else { %>
+      <div class="p-2">
+        <a href="/login" class="btn btn-light">Login</a>
+        <a href="/register" class="btn btn-light">Register</a>
+      </div>
+    <% } %>
 
-    
   </nav>
 
-  <% if (user) { %>
-    <div class="p-2">
-      <p>Logged in as: <strong><%= user.email %></strong></p>
-      <form method="POST" action="/logout">
-        <button type="submit" class="btn btn-light">Logout</button>
-      </form>
-    </div>
-  <% } else { %>
-    <div class="p-2">
-      <a href="/login" class="btn btn-light">Login</a>
-      <a href="/register" class="btn btn-light">Register</a>
-    </div>
-  <% } %>
 </header>

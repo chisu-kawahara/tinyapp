@@ -17,6 +17,16 @@ function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
 
+const urlDatabase = {
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",   // Who created this URL
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
+};
 function urlsForUser(id) {
   const filteredURLs = {};
   for (const shortURL in urlDatabase) {
@@ -27,7 +37,8 @@ function urlsForUser(id) {
   return filteredURLs;
 }
 
-
-module.exports = { getUserByEmail };
-module.exports = { generateRandomString };
-module.exports = { urlsForUser };
+module.exports = {
+  getUserByEmail,
+  generateRandomString,
+  urlsForUser
+};
